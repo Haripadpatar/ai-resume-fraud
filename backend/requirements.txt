@@ -4,5 +4,7 @@ pymupdf
 spacy
 sentence-transformers
 scikit-learn
+sqlalchemy
 requests
+
 

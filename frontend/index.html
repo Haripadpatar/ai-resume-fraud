@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Resume Fraud Detector</title>
+<style>
+body{font-family:Arial; background:#0f172a; color:white; padding:20px}
+table{border-collapse:collapse; width:100%; margin-top:20px}
+th,td{border:1px solid #334155; padding:10px; text-align:left}
+th{background:#1e293b}
+.genuine{color:#22c55e}
+.suspicious{color:#facc15}
+.fake{color:#ef4444}
+</style>
+</head>
+
+<body>
+<h2>AI Resume Fraud Detector – HR Dashboard</h2>
+
+<input type="file" id="file">
+<button onclick="upload()">Analyze Resume</button>
+
+<h3>Candidate Database</h3>
+<table>
+<thead>
+<tr>
+<th>Resume</th>
+<th>Skills</th>
+<th>Fraud Score</th>
+<th>Risk</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+<script>
+function upload(){
+    let f=document.getElementById("file").files[0]
+    let form=new FormData()
+    form.append("file",f)
+
+    fetch("http://127.0.0.1:8000/upload",{
+        method:"POST",
+        body:form
+    }).then(r=>r.json()).then(()=>{
+        loadCandidates()
+    })
+}
+
+function loadCandidates(){
+    fetch("http://127.0.0.1:8000/candidates")
+    .then(r=>r.json())
+    .then(data=>{
+        let html=""
+        data.forEach(c=>{
+            let cls = c.risk.toLowerCase()
+            html+=`<tr>
+                <td>${c.id}</td>
+                <td>${c.skills.join(", ")}</td>
+                <td>${c.fraud_score.toFixed(1)}</td>
+                <td class="${cls}">${c.risk}</td>
+            </tr>`
+        })
+        document.getElementById("rows").innerHTML=html
+    })
+}
+
+loadCandidates()
+</script>
+</body>
+</html>
